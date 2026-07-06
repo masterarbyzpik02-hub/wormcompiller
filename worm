@@ -96,96 +96,20 @@ create_project() {
 create_startup_file() {
     local file="$1"
     cat > "$file" << 'EOF'
-// startup_station_script.enes
-// Главный стартовый скрипт проекта EnergyScript
-
-@ENERGY_LEVEL = HIGH
-@PROJECT_MODE = DEVELOPMENT
-
-// Инициализация энергетической системы
-INITIALIZE_ENERGY_SYSTEM() {
-    LOG("🚀 EnergyScript System Initialized")
-    LOG("⚡ Energy Level: " + @ENERGY_LEVEL)
-    LOG("🔧 Project Mode: " + @PROJECT_MODE)
-    
-    // Загрузка основных модулей
-    LOAD_MODULE("src/logic_work.enes")
-    LOAD_MODULE("src/myscript.enes")
-    
-    // Запуск главного цикла
-    START_MAIN_LOOP()
+debug me project => {
+   Debug now project() => {
+      assembly me all files::from.project();
+      configuration compille and assembly this project => '1' file => {
+      	assembly in '1' file ["project" ..in::binar.file.compille::is.NOW];
+      } return 0; 
+   } and -> {
+      compille in => {file::"binar", true??: {
+      	yes, true!;
+      }} compille now {
+      	yes, true!;
+      }
+   }
 }
-
-// Функция логирования
-FUNCTION LOG(message) {
-    CONSOLE_OUTPUT("[ENERGYSCRIPT] " + message)
-}
-
-// Точка входа
-MAIN() {
-    LOG("Starting EnergyScript Project...")
-    INITIALIZE_ENERGY_SYSTEM()
-}
-
-// Запуск проекта
-EXECUTE(MAIN)
-EOF
-}
-
-# Создание файла логики
-create_logic_file() {
-    local file="$1"
-    cat > "$file" << 'EOF'
-// logic_work.enes
-// Основная логика проекта
-
-// Конфигурация логики
-@LOGIC_VERSION = "1.0.0"
-@AUTHOR = "EnergyScript Developer"
-
-// Основные функции логики
-FUNCTION PROCESS_DATA(input) {
-    VAR result = input * 2
-    RETURN result
-}
-
-FUNCTION ANALYZE_ENERGY(data) {
-    VAR analysis = {
-        "power": CALCULATE_POWER(data),
-        "efficiency": CALCULATE_EFFICIENCY(data),
-        "stability": CHECK_STABILITY(data)
-    }
-    RETURN analysis
-}
-
-FUNCTION CALCULATE_POWER(data) {
-    // Расчет мощности
-    VAR power = data * 3.14
-    RETURN power
-}
-
-FUNCTION CALCULATE_EFFICIENCY(data) {
-    // Расчет эффективности
-    IF data > 0 {
-        RETURN data / 100
-    } ELSE {
-        RETURN 0
-    }
-}
-
-FUNCTION CHECK_STABILITY(data) {
-    // Проверка стабильности
-    VAR threshold =在海边
-    IF data < threshold {
-        RETURN "STABLE"
-    } ELSE {
-        RETURN "UNSTABLE"
-    }
-}
-
-// Экспорт функций
-EXPORT PROCESS_DATA
-EXPORT ANALYZE_ENERGY
 EOF
 }
 
@@ -193,49 +117,7 @@ EOF
 create_myscript_file() {
     local file="$1"
     cat > "$file" << 'EOF'
-// myscript.enes
-// Пользовательский скрипт проекта
-
-// Импорт функций логики
-IMPORT PROCESS_DATA FROM "logic_work.enes"
-IMPORT ANALYZE_ENERGY FROM "logic_work.enes"
-
-// Пользовательские настройки
-@USER_CONFIG = {
-    "auto_start": TRUE,
-    "debug_mode": FALSE,
-    "energy_saving": TRUE
-}
-
-// Основная функция пользователя
-FUNCTION USER_MAIN() {
-    LOG("👤 User script started")
-    
-    // Тестовые данные
-    VAR test_data = [10, 20, 30, 40, 50]
-    
-    // Обработка данных
-    FOREACH data IN test_data {
-        VAR processed = PROCESS_DATA(data)
-        VAR analysis = ANALYZE_ENERGY(processed)
-        
-        LOG("Data: " + data + " → Processed: " + processed)
-        LOG("Analysis: " + TO_STRING(analysis))
-    }
-    
-    LOG("✅ User script completed successfully")
-}
-
-// Инициализация пользовательского скрипта
-FUNCTION INIT_USER_SCRIPT() {
-    IF @USER_CONFIG["auto_start"] {
-        USER_MAIN()
-    }
-}
-
-// Экспорт функций
-EXPORT USER_MAIN
-EXPORT INIT_USER_SCRIPT
+// write your code, bro!
 EOF
 }
 
