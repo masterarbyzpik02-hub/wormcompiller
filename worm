@@ -1,0 +1,330 @@
+#!/bin/bash
+
+# WORM Package Manager for EnergyScript
+# Version 1.0
+# Author: EnergyScript Team
+
+# Цвета для вывода
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+PURPLE='\033[0;35m'
+CYAN='\033[0;36m'
+NC='\033[0m' # No Color
+
+# Путь к иконке
+ICON_PATH="/home/masterarbuzadd/Downloads/en2.png"
+WORM_DIR="$HOME/.worm"
+PROJECT_COUNTER_FILE="$WORM_DIR/project_counter.txt"
+PROJECTS_LOG="$WORM_DIR/projects.log"
+
+# Проверка и создание директории worm
+init_worm() {
+    if [ ! -d "$WORM_DIR" ]; then
+        mkdir -p "$WORM_DIR"
+        echo "0" > "$PROJECT_COUNTER_FILE"
+        echo "# WORM Projects Log" > "$PROJECTS_LOG"
+        echo -e "${GREEN}✓ WORM инициализирован в $WORM_DIR${NC}"
+    fi
+}
+
+# Получение следующего номера проекта
+get_next_project_number() {
+    if [ ! -f "$PROJECT_COUNTER_FILE" ]; then
+        echo "0" > "$PROJECT_COUNTER_FILE"
+    fi
+    local counter=$(cat "$PROJECT_COUNTER_FILE")
+    counter=$((counter + 1))
+    echo "$counter" > "$PROJECT_COUNTER_FILE"
+    echo "$counter"
+}
+
+# Создание проекта
+create_project() {
+    local project_number=$(get_next_project_number)
+    local project_name="My new Project $project_number"
+    local project_dir="$PWD/$project_name"
+    
+    # Проверка существования проекта
+    if [ -d "$project_dir" ]; then
+        echo -e "${RED}✗ Ошибка: Проект '$project_name' уже существует!${NC}"
+        exit 1
+    fi
+    
+    # Создание структуры проекта
+    echo -e "${CYAN}🚀 Создание проекта EnergyScript...${NC}"
+    mkdir -p "$project_dir"
+    mkdir -p "$project_dir/src"
+    
+    # Создание файлов проекта
+    create_startup_file "$project_dir/startup_station_script.enes"
+    create_logic_file "$project_dir/src/logic_work.enes"
+    create_myscript_file "$project_dir/src/myscript.enes"
+    
+    # Копирование иконки (если существует)
+    if [ -f "$ICON_PATH" ]; then
+        cp "$ICON_PATH" "$project_dir/icon.png"
+        echo -e "${GREEN}✓ Иконка проекта скопирована${NC}"
+    else
+        echo -e "${YELLOW}⚠ Иконка не найдена по пути: $ICON_PATH${NC}"
+        echo -e "${YELLOW}⚠ Создаю заглушку для иконки...${NC}"
+        echo "Icon placeholder" > "$project_dir/icon.txt"
+    fi
+    
+    # Логирование проекта
+    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    echo "$timestamp | $project_number | $project_dir" >> "$PROJECTS_LOG"
+    
+    echo -e "${GREEN}✅ Проект создан успешно!${NC}"
+    echo -e "${BLUE}📁 Название проекта: $project_name${NC}"
+    echo -e "${BLUE}📁 Путь к проекту: $project_dir${NC}"
+    echo -e "${BLUE}🔢 Номер проекта: $project_number${NC}"
+    echo -e "${PURPLE}📝 Файлы созданы:${NC}"
+    echo -e "  • startup_station_script.enes"
+    echo -e "  • src/logic_work.enes"
+    echo -e "  • src/myscript.enes"
+    
+    # Открытие папки проекта (опционально)
+    if command -v xdg-open &> /dev/null; then
+        echo -e "${YELLOW}📂 Открываю папку проекта...${NC}"
+        xdg-open "$project_dir" &
+    fi
+}
+
+# Создание стартового файла
+create_startup_file() {
+    local file="$1"
+    cat > "$file" << 'EOF'
+// startup_station_script.enes
+// Главный стартовый скрипт проекта EnergyScript
+
+@ENERGY_LEVEL = HIGH
+@PROJECT_MODE = DEVELOPMENT
+
+// Инициализация энергетической системы
+INITIALIZE_ENERGY_SYSTEM() {
+    LOG("🚀 EnergyScript System Initialized")
+    LOG("⚡ Energy Level: " + @ENERGY_LEVEL)
+    LOG("🔧 Project Mode: " + @PROJECT_MODE)
+    
+    // Загрузка основных модулей
+    LOAD_MODULE("src/logic_work.enes")
+    LOAD_MODULE("src/myscript.enes")
+    
+    // Запуск главного цикла
+    START_MAIN_LOOP()
+}
+
+// Функция логирования
+FUNCTION LOG(message) {
+    CONSOLE_OUTPUT("[ENERGYSCRIPT] " + message)
+}
+
+// Точка входа
+MAIN() {
+    LOG("Starting EnergyScript Project...")
+    INITIALIZE_ENERGY_SYSTEM()
+}
+
+// Запуск проекта
+EXECUTE(MAIN)
+EOF
+}
+
+# Создание файла логики
+create_logic_file() {
+    local file="$1"
+    cat > "$file" << 'EOF'
+// logic_work.enes
+// Основная логика проекта
+
+// Конфигурация логики
+@LOGIC_VERSION = "1.0.0"
+@AUTHOR = "EnergyScript Developer"
+
+// Основные функции логики
+FUNCTION PROCESS_DATA(input) {
+    VAR result = input * 2
+    RETURN result
+}
+
+FUNCTION ANALYZE_ENERGY(data) {
+    VAR analysis = {
+        "power": CALCULATE_POWER(data),
+        "efficiency": CALCULATE_EFFICIENCY(data),
+        "stability": CHECK_STABILITY(data)
+    }
+    RETURN analysis
+}
+
+FUNCTION CALCULATE_POWER(data) {
+    // Расчет мощности
+    VAR power = data * 3.14
+    RETURN power
+}
+
+FUNCTION CALCULATE_EFFICIENCY(data) {
+    // Расчет эффективности
+    IF data > 0 {
+        RETURN data / 100
+    } ELSE {
+        RETURN 0
+    }
+}
+
+FUNCTION CHECK_STABILITY(data) {
+    // Проверка стабильности
+    VAR threshold =在海边
+    IF data < threshold {
+        RETURN "STABLE"
+    } ELSE {
+        RETURN "UNSTABLE"
+    }
+}
+
+// Экспорт функций
+EXPORT PROCESS_DATA
+EXPORT ANALYZE_ENERGY
+EOF
+}
+
+# Создание файла скрипта
+create_myscript_file() {
+    local file="$1"
+    cat > "$file" << 'EOF'
+// myscript.enes
+// Пользовательский скрипт проекта
+
+// Импорт функций логики
+IMPORT PROCESS_DATA FROM "logic_work.enes"
+IMPORT ANALYZE_ENERGY FROM "logic_work.enes"
+
+// Пользовательские настройки
+@USER_CONFIG = {
+    "auto_start": TRUE,
+    "debug_mode": FALSE,
+    "energy_saving": TRUE
+}
+
+// Основная функция пользователя
+FUNCTION USER_MAIN() {
+    LOG("👤 User script started")
+    
+    // Тестовые данные
+    VAR test_data = [10, 20, 30, 40, 50]
+    
+    // Обработка данных
+    FOREACH data IN test_data {
+        VAR processed = PROCESS_DATA(data)
+        VAR analysis = ANALYZE_ENERGY(processed)
+        
+        LOG("Data: " + data + " → Processed: " + processed)
+        LOG("Analysis: " + TO_STRING(analysis))
+    }
+    
+    LOG("✅ User script completed successfully")
+}
+
+// Инициализация пользовательского скрипта
+FUNCTION INIT_USER_SCRIPT() {
+    IF @USER_CONFIG["auto_start"] {
+        USER_MAIN()
+    }
+}
+
+// Экспорт функций
+EXPORT USER_MAIN
+EXPORT INIT_USER_SCRIPT
+EOF
+}
+
+# Показать список проектов
+list_projects() {
+    echo -e "${CYAN}📋 Список проектов WORM:${NC}"
+    echo "================================="
+    
+    if [ -f "$PROJECTS_LOG" ]; then
+        local line_number=1
+        while IFS= read -r line; do
+            if [[ ! "$line" =~ ^# ]] && [[ -n "$line" ]]; then
+                echo -e "${GREEN}$line_number. $line${NC}"
+                line_number=$((line_number + 1))
+            fi
+        done < "$PROJECTS_LOG"
+    else
+        echo -e "${YELLOW}Нет созданных проектов${NC}"
+    fi
+}
+
+# Показать справку
+show_help() {
+    echo -e "${CYAN}🐛 WORM Package Manager for EnergyScript${NC}"
+    echo "=========================================="
+    echo -e "${GREEN}Использование:${NC}"
+    echo "  sudo worm me new project        - Создать новый проект"
+    echo "  worm list projects              - Показать список проектов"
+    echo "  worm --help                     - Показать эту справку"
+    echo "  worm --version                  - Показать версию"
+    echo ""
+    echo -e "${YELLOW}Пример:${NC}"
+    echo "  sudo worm me new project"
+    echo "  # Создаст проект 'My new Project X' в текущей директории"
+}
+
+# Показать версию
+show_version() {
+    echo -e "${PURPLE}WORM Package Manager v1.0${NC}"
+    echo "Для EnergyScript"
+}
+
+# Основная логика
+main() {
+    # Инициализация WORM
+    init_worm
+    
+    # Проверка аргументов
+    if [ $# -eq 0 ]; then
+        show_help
+        exit 0
+    fi
+    
+    case "$1" in
+        "me")
+            if [ "$2" = "new" ] && [ "$3" = "project" ]; then
+                # Проверка прав суперпользователя
+                if [ "$EUID" -ne 0 ]; then 
+                    echo -e "${RED}✗ Ошибка: Для создания проекта требуются права суперпользователя${NC}"
+                    echo -e "${YELLOW}Используйте: sudo worm me new project${NC}"
+                    exit 1
+                fi
+                create_project
+            else
+                echo -e "${RED}✗ Неверная команда${NC}"
+                show_help
+            fi
+            ;;
+        "list")
+            if [ "$2" = "projects" ]; then
+                list_projects
+            else
+                echo -e "${RED}✗ Неверная команда${NC}"
+                show_help
+            fi
+            ;;
+        "--help" | "-h")
+            show_help
+            ;;
+        "--version" | "-v")
+            show_version
+            ;;
+        *)
+            echo -e "${RED}✗ Неизвестная команда: $1${NC}"
+            show_help
+            exit 1
+            ;;
+    esac
+}
+
+# Запуск основной функции
+main "$@"
